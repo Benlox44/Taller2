@@ -385,7 +385,7 @@ array<int, 2> miniMax(vector<vector<int>> &b, unsigned int d, int alf, int bet, 
 
 int aiMove(int d)
 {
-    if (d == 1) {maxDepth = 3;}
+    if (d == 1) {maxDepth = 2;}
     if (d == 2) {maxDepth = 5;}
     if (d == 3) {maxDepth = 8;}
 
