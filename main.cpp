@@ -142,7 +142,7 @@ bool winningMove(vector<vector<int> > &b, unsigned int p)
 {
 	unsigned int winSequence = 0;
 
-	for (unsigned int c = 0; c < numCol - 3; c++)
+	for (unsigned int c = 0; c < numCol - 3; c++) //horizontal
     {
 		for (unsigned int r = 0; r < numRow; r++)
         {
@@ -161,7 +161,7 @@ bool winningMove(vector<vector<int> > &b, unsigned int p)
 		}
 	}
 
-	for (unsigned int c = 0; c < numCol; c++)
+	for (unsigned int c = 0; c < numCol; c++) //vertical
     {
 		for (unsigned int r = 0; r < numRow - 3; r++)
         {
@@ -180,7 +180,7 @@ bool winningMove(vector<vector<int> > &b, unsigned int p)
 		}
 	}
 
-	for (unsigned int c = 0; c < numCol - 3; c++)
+	for (unsigned int c = 0; c < numCol - 3; c++) //diagonals
     {
 		for (unsigned int r = 3; r < numRow; r++)
         {
@@ -215,26 +215,26 @@ bool winningMove(vector<vector<int> > &b, unsigned int p)
 			winSequence = 0;
 		}
 	}
-	return false;
+	return false; //if any, no winning
 }
 
 int heurFunction(unsigned int g, unsigned int b, unsigned int z)
 {
 	int score = 0;
-	if (g == 4) { score += 500001; }
+	if (g == 4) { score += 500001; } //for win vs block
 	else if (g == 3 && z == 1) { score += 5000; }
 	else if (g == 2 && z == 2) { score += 500; }
-	else if (b == 2 && z == 2) { score -= 501; }
-	else if (b == 3 && z == 1) { score -= 5001; }
+	else if (b == 2 && z == 2) { score -= 501; } // block
+	else if (b == 3 && z == 1) { score -= 5001; } // block
 	else if (b == 4) { score -= 500000; }
 	return score;
 }
 
 int scoreSet(vector<unsigned int> v, unsigned int p)
 {
-	unsigned int good = 0;
-	unsigned int bad = 0;
-	unsigned int empty = 0;
+	unsigned int good = 0; //points to P
+	unsigned int bad = 0; //Points against P
+	unsigned int empty = 0; //Neutral
 	for (unsigned int i = 0; i < v.size(); i++)
     {
 		good += (v[i] == p) ? 1 : 0;
@@ -242,7 +242,7 @@ int scoreSet(vector<unsigned int> v, unsigned int p)
 		empty += (v[i] == 0) ? 1 : 0;
 	}
 
-	bad -= good;
+	bad -= good; //bad = (bad + good)
 	return heurFunction(good, bad, empty);
 }
 
@@ -253,7 +253,7 @@ int tabScore(vector<vector<int>> b, unsigned int p)
 	vector<unsigned int> cs(numRow);
 	vector<unsigned int> set(4);
 	
-	for (unsigned int r = 0; r < numRow; r++)
+	for (unsigned int r = 0; r < numRow; r++) //horizontal
     {
 		for (unsigned int c = 0; c < numCol; c++)
         {
@@ -269,7 +269,7 @@ int tabScore(vector<vector<int>> b, unsigned int p)
 		}
 	}
 
-	for (unsigned int c = 0; c < numCol; c++)
+	for (unsigned int c = 0; c < numCol; c++) //vertical
     {
 		for (unsigned int r = 0; r < numRow; r++)
         {
@@ -285,7 +285,7 @@ int tabScore(vector<vector<int>> b, unsigned int p)
 		}
 	}
 
-	for (unsigned int r = 0; r < numRow - 3; r++)
+	for (unsigned int r = 0; r < numRow - 3; r++) //diagonals
     {
 		for (unsigned int c = 0; c < numCol; c++)
         {
@@ -321,47 +321,47 @@ int tabScore(vector<vector<int>> b, unsigned int p)
 
 array<int, 2> miniMax(vector<vector<int>> &b, unsigned int d, int alf, int bet, unsigned int p)
 {
-	if (d == 0 || d >= (numCol * numRow) - turns)
+	if (d == 0 || d >= (numCol * numRow) - turns) //get current score
     {
 		return array<int, 2>{tabScore(b, computer), -1};
 	}
-	if (p == computer)
+	if (p == computer) // if AI player (maximizing) want lowest score
     {
 		array<int, 2> moveSoFar = {INT_MIN, -1};
-		if (winningMove(b, player))
+		if (winningMove(b, player)) // if player about to win
         {
-			return moveSoFar;
+			return moveSoFar; // worst possible score
 		}
 
-		for (unsigned int c = 0; c < numCol; c++)
+		for (unsigned int c = 0; c < numCol; c++) //for each move
         {
-			if (b[numRow - 1][c] == 0)
+			if (b[numRow - 1][c] == 0) //column non full
             {
 				vector<vector<int> > newBoard = copyBoard(b);
-				makeMove(newBoard, c, p);
-				int score = miniMax(newBoard, d - 1, alf, bet, player)[0];
-				if (score > moveSoFar[0])
+				makeMove(newBoard, c, p); //try move on copy of the board
+				int score = miniMax(newBoard, d - 1, alf, bet, player)[0]; //find move
+				if (score > moveSoFar[0]) //if better, replace
                 {
 					moveSoFar = {score, (int)c};
 				}
 				alf = max(alf, moveSoFar[0]);
-				if (alf >= bet)
+				if (alf >= bet) //for pruning
                 {
                     break;
                 }
 			}
 		}
-		return moveSoFar;
+		return moveSoFar; //return best move
 	}
 
-	else
+	else // if Player (minimized) want higher score
     {
 		array<int, 2> moveSoFar = {INT_MAX, -1};
-		if (winningMove(b, computer))
+		if (winningMove(b, computer)) //if about to win
         {
-			return moveSoFar;
+			return moveSoFar; //best possible score
 		}
-		for (unsigned int c = 0; c < numCol; c++)
+		for (unsigned int c = 0; c < numCol; c++) //similar code bit opossite
         {
 			if (b[numRow - 1][c] == 0)
             {
@@ -401,7 +401,7 @@ int userMove(int d)
     {
 		cout << "Enter a column [0 to save]: ";
 		cin >> move;
-        move--;
+        move--; // real move
 
 		if (!cin)
         {
@@ -409,7 +409,7 @@ int userMove(int d)
 			cin.ignore(INT_MAX, '\n');
 			cout << "Use a value [1-" << numCol << "]" << endl;
 		}
-        else if (move == -1)
+        else if (move == -1) //save
         {
             saveStatus(d, board);
             cout << endl;
@@ -454,10 +454,10 @@ void playGame(int d)
 		}
 		else if (turns == numRow * numCol)
         {
-			gameOver = true;
+			gameOver = true; //draw
 		}
 
-		gameOver = winningMove(board, currentplayer);
+		gameOver = winningMove(board, currentplayer); //win
 		currentplayer = (currentplayer == 1) ? 2 : 1;
 		turns++;
 		cout << endl;
