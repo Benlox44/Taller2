@@ -18,7 +18,6 @@ unsigned int player = 1;
 unsigned int computer = 2;
 unsigned int maxDepth = 8;
 
-bool gameOver = false;
 unsigned int turns = 0;
 unsigned int currentplayer = player;
 
@@ -434,6 +433,7 @@ int userMove(int d)
 
 void playGame(int d)
 {
+    bool gameOver = false;
     if (d == 1) {cout << "Difficulty: Easy" << endl;}
     if (d == 2) {cout << "Difficulty: Medium" << endl;}
     if (d == 3) {cout << "Difficulty: Hard" << endl;}
@@ -500,30 +500,8 @@ int setDifficulty()
     }
 }
 
-int main(int argc, char** argv)
+int main()
 {
-	int i = -1; bool flag = false;
-
-	if (argc == 2)
-    {
-		istringstream in(argv[1]);
-		if (!(in >> i))
-        {
-            flag = true;
-        }
-		if (i > (int)(numRow * numCol) || i <= -1)
-        {
-            flag = true;
-        }
-		if (flag)
-        {
-            cout << "Invalid command line argument, using default depth = 5." << endl;
-        }
-		else
-        {
-            maxDepth = i;
-        }
-	}
 
 	initBoard();
 
@@ -533,7 +511,7 @@ int main(int argc, char** argv)
     do
     {
         cout << "==Menu==" << endl;
-        cout << "1. New Game" << endl;
+        cout << "1. Play" << endl;
         cout << "2. Load" << endl;
         cout << "3. Change difficulty" << endl;
         cout << "4. Exit" << endl;
